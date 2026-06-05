@@ -33,6 +33,8 @@ class TopbarNavigationTest extends TestCase
             ->get('/')
             ->assertOk()
             ->assertSee('Dashboard')
+            ->assertSee($user->name)
+            ->assertSee('Appearance')
             ->assertSee('Logout')
             ->assertDontSee('Sign up');
     }
