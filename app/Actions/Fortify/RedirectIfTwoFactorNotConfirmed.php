@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Actions\Fortify;
+
+use Laravel\Fortify\Actions\Action;
+
+class RedirectIfTwoFactorNotConfirmed extends Action
+{
+    /**
+     * Handle the incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $next
+     * @return mixed
+     */
+    public function __invoke($request, $next)
+    {
+        if ($request->user() && ! $request->user()->two_factor_confirmed_at) {
+            return redirect()->route('two-factor.show');
+        }
+
+        return $next($request);
+    }
+}
