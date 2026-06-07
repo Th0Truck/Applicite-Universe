@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\LoginResponse;
 use App\Actions\Fortify\LoginViewResponse;
 use App\Actions\Fortify\RegisterResponse;
 use App\Actions\Fortify\RegisterViewResponse;
@@ -16,10 +17,12 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LoginViewResponse as LoginViewResponseContract;
 use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
 use Laravel\Fortify\Contracts\RegisterViewResponse as RegisterViewResponseContract;
 use Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse as TwoFactorChallengeViewResponseContract;
+use Laravel\Fortify\Contracts\TwoFactorLoginResponse as TwoFactorLoginResponseContract;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -31,6 +34,8 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->app->bind(RegisterViewResponseContract::class, RegisterViewResponse::class);
         $this->app->bind(LoginViewResponseContract::class, LoginViewResponse::class);
+        $this->app->bind(LoginResponseContract::class, LoginResponse::class);
+        $this->app->bind(TwoFactorLoginResponseContract::class, LoginResponse::class);
         $this->app->bind(RegisterResponseContract::class, RegisterResponse::class);
         $this->app->bind(TwoFactorChallengeViewResponseContract::class, TwoFactorChallengeViewResponse::class);
     }
@@ -66,6 +71,3 @@ class FortifyServiceProvider extends ServiceProvider
         });
     }
 }
-
-
-

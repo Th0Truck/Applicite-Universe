@@ -15,16 +15,20 @@ class RoleAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        $guardName = 'web';
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = $this->permissionNames();
 
         foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission);
+            Permission::findOrCreate($permission, $guardName);
         }
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         foreach (config('access.roles', []) as $roleName => $rolePermissions) {
-            $role = Role::findOrCreate($roleName);
+            $role = Role::findOrCreate($roleName, $guardName);
             $role->syncPermissions($this->permissionsForRole($rolePermissions, $permissions));
         }
 
