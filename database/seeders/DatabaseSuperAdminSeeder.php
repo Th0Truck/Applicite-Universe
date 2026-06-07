@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class DatabaseSuperAdminSeeder extends Seeder
 {
     use WithoutModelEvents;
 
@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleAndPermissionSeeder::class);
 
         // User::factory(10)->create();
+
+        // TODO; Remove this and create a proper user seeder that creates a super admin user.
+        // Add this to the documentation and make sure to change the password before deploying to production.
+        // Consider adding this to gitignore and add a note about it in the documentation to avoid accidentally committing it to version control.
 
         $user = User::factory()->create([
             'name' => 'Thomas Troelsen',
