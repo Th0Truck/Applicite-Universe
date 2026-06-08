@@ -85,6 +85,13 @@
                     </a>
                 @endcan
 
+                @can('pages.view')
+                    <a class="dashboard-action" href="{{ route('dashboard.cms.pages.index') }}">
+                        <strong>Pages</strong>
+                        <span>Create CMS pages with paragraph templates.</span>
+                    </a>
+                @endcan
+
                 <a class="dashboard-action" href="{{ route('two-factor.show') }}">
                     <strong>Security</strong>
                     <span>Manage your two-factor authentication setup.</span>

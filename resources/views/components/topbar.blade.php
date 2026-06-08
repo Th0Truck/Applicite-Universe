@@ -364,6 +364,11 @@
                         Users
                     </a>
                 @endcan
+                @can('pages.view')
+                    <a class="universe-topbar__link {{ request()->routeIs('dashboard.cms.*') ? 'universe-topbar__link--primary' : '' }}" href="{{ route('dashboard.cms.pages.index') }}">
+                        Pages
+                    </a>
+                @endcan
                 <details class="universe-topbar__account">
                     <summary class="universe-topbar__button universe-topbar__account-button">
                         <span class="universe-topbar__account-name">{{ $accountLabel }}</span>
