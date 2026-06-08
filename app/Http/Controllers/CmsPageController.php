@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
+use App\Support\CmsHtmlSanitizer;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class CmsPageController extends Controller
 {
@@ -21,7 +24,10 @@ class CmsPageController extends Controller
         return view('dashboard.cms.pages.index', [
             'pages' => CmsPage::query()
                 ->withCount('paragraphs')
-                ->latest()
+                ->with('parent')
+                ->orderBy('parent_id')
+                ->orderBy('sort_order')
+                ->orderBy('title')
                 ->paginate(20),
         ]);
     }
@@ -31,9 +37,17 @@ class CmsPageController extends Controller
      */
     public function create(): View
     {
+        $parentId = request()->integer('parent_id') ?: null;
+
         return view('dashboard.cms.pages.create', [
-            'page' => new CmsPage(['template' => 'standard', 'is_published' => true]),
+            'page' => new CmsPage([
+                'parent_id' => $parentId,
+                'sort_order' => $this->nextSortOrder($parentId),
+                'template' => 'standard',
+                'is_published' => true,
+            ]),
             'paragraphs' => collect(),
+            'parentPages' => $this->parentPageOptions(),
             'templates' => config('cms.templates'),
         ]);
     }
@@ -61,6 +75,7 @@ class CmsPageController extends Controller
         return view('dashboard.cms.pages.edit', [
             'page' => $page->load('paragraphs'),
             'paragraphs' => $page->paragraphs,
+            'parentPages' => $this->parentPageOptions($page),
             'templates' => config('cms.templates'),
         ]);
     }
@@ -121,8 +136,10 @@ class CmsPageController extends Controller
      */
     private function validatedPage(Request $request, ?CmsPage $page = null): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'parent_id' => ['nullable', 'integer', 'exists:cms_pages,id'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'slug' => [
                 'nullable',
                 'string',
@@ -133,12 +150,27 @@ class CmsPageController extends Controller
             'is_published' => ['nullable', 'boolean'],
             'paragraphs' => ['array'],
             'paragraphs.*.id' => ['nullable', 'integer', 'exists:cms_paragraphs,id'],
+            'paragraphs.*.sort_order' => ['nullable', 'integer', 'min:0'],
             'paragraphs.*.heading' => ['nullable', 'string', 'max:255'],
             'paragraphs.*.subheading' => ['nullable', 'string', 'max:255'],
             'paragraphs.*.body' => ['nullable', 'string'],
             'paragraphs.*.image' => ['nullable', 'image', 'max:4096'],
             'paragraphs.*.remove_image' => ['nullable', 'boolean'],
         ]);
+
+        if ($page !== null && $this->wouldCreateCircularParent($page, (int) ($validated['parent_id'] ?? 0))) {
+            throw ValidationException::withMessages([
+                'parent_id' => 'A page cannot be nested beneath itself or one of its sub-pages.',
+            ]);
+        }
+
+        if ($this->wouldCreateNestedSubPage($validated, $page)) {
+            throw ValidationException::withMessages([
+                'parent_id' => 'Sub-pages cannot have their own sub-pages.',
+            ]);
+        }
+
+        return $validated;
     }
 
     /**
@@ -152,6 +184,8 @@ class CmsPageController extends Controller
         $slug = trim((string) ($validated['slug'] ?? ''));
 
         return [
+            'parent_id' => filled($validated['parent_id'] ?? null) ? (int) $validated['parent_id'] : null,
+            'sort_order' => (int) ($validated['sort_order'] ?? 0),
             'title' => $validated['title'],
             'slug' => Str::slug($slug !== '' ? $slug : $validated['title']),
             'template' => $validated['template'],
@@ -169,7 +203,7 @@ class CmsPageController extends Controller
 
         foreach ($request->input('paragraphs', []) as $index => $paragraphInput) {
             $heading = trim((string) Arr::get($paragraphInput, 'heading', ''));
-            $body = trim((string) Arr::get($paragraphInput, 'body', ''));
+            $body = CmsHtmlSanitizer::sanitize(Arr::get($paragraphInput, 'body'));
 
             if ($heading === '' && $body === '') {
                 continue;
@@ -189,7 +223,7 @@ class CmsPageController extends Controller
             }
 
             $paragraph->fill([
-                'sort_order' => $index,
+                'sort_order' => (int) Arr::get($paragraphInput, 'sort_order', $index),
                 'heading' => $heading,
                 'subheading' => Arr::get($paragraphInput, 'subheading'),
                 'body' => $body,
@@ -217,5 +251,92 @@ class CmsPageController extends Controller
         if ($imagePath !== null) {
             Storage::disk('public')->delete($imagePath);
         }
+    }
+
+    /**
+     * Get the next order value for a sibling group.
+     */
+    private function nextSortOrder(?int $parentId): int
+    {
+        return ((int) CmsPage::query()
+            ->where('parent_id', $parentId)
+            ->max('sort_order')) + 1;
+    }
+
+    /**
+     * Get possible parent pages for the page form.
+     *
+     * @return Collection<int, CmsPage>
+     */
+    private function parentPageOptions(?CmsPage $page = null): Collection
+    {
+        $pages = CmsPage::query()
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
+
+        if ($page === null || ! $page->exists) {
+            return $pages;
+        }
+
+        $excludedIds = collect([$page->id])
+            ->merge($this->descendantIds($page, $pages))
+            ->all();
+
+        return $pages
+            ->reject(fn (CmsPage $option): bool => in_array($option->id, $excludedIds, true))
+            ->values();
+    }
+
+    /**
+     * Determine whether assigning a parent would create a page cycle.
+     */
+    private function wouldCreateCircularParent(CmsPage $page, int $parentId): bool
+    {
+        if ($parentId === 0) {
+            return false;
+        }
+
+        return $this->descendantIds($page, CmsPage::query()->get())
+            ->push($page->id)
+            ->contains($parentId);
+    }
+
+    /**
+     * Determine whether page nesting would exceed the supported depth.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    private function wouldCreateNestedSubPage(array $validated, ?CmsPage $page = null): bool
+    {
+        $parentId = filled($validated['parent_id'] ?? null) ? (int) $validated['parent_id'] : null;
+
+        if ($parentId === null) {
+            return false;
+        }
+
+        $parent = CmsPage::query()->find($parentId);
+
+        if ($parent?->parent_id !== null) {
+            return true;
+        }
+
+        return $page !== null && $page->children()->exists();
+    }
+
+    /**
+     * Get all descendant page IDs for a page.
+     *
+     * @param  Collection<int, CmsPage>  $pages
+     * @return Collection<int, int>
+     */
+    private function descendantIds(CmsPage $page, Collection $pages): Collection
+    {
+        $children = $pages->where('parent_id', $page->id);
+
+        return $children->flatMap(function (CmsPage $child) use ($pages): Collection {
+            return collect([$child->id])->merge($this->descendantIds($child, $pages));
+        })->values();
     }
 }

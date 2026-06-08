@@ -6,7 +6,9 @@
     <title>{{ $page->title }} - Universe</title>
     @include('cms.templates.styles')
 </head>
-<body class="cms-page">
+<body class="cms-page has-universe-topbar">
+    @include('components.topbar')
+
     <main class="cms-shell cms-shell--feature">
         <header class="cms-hero">
             <h1>{{ $page->title }}</h1>
@@ -20,7 +22,9 @@
                 <div>
                     <p class="cms-kicker">{{ $paragraph->subheading }}</p>
                     <h2>{{ $paragraph->heading }}</h2>
-                    <p>{{ $paragraph->body }}</p>
+                    <div class="cms-rich-text">
+                        {!! \App\Support\CmsHtmlSanitizer::sanitize($paragraph->body) !!}
+                    </div>
                 </div>
             </section>
         @endforeach

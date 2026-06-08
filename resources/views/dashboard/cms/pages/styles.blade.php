@@ -117,6 +117,86 @@
         resize: vertical;
     }
 
+    .rich-editor {
+        border: 1px solid #cfd6e3;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .rich-editor__toolbar {
+        align-items: center;
+        background: #f5f7fb;
+        border-bottom: 1px solid #d8deea;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .rich-editor__button {
+        align-items: center;
+        background: white;
+        border: 1px solid #d8deea;
+        border-radius: 6px;
+        color: #172033;
+        cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        height: 34px;
+        justify-content: center;
+        min-width: 34px;
+        padding: 0 9px;
+    }
+
+    .rich-editor__button:hover {
+        background: #eef2ff;
+        border-color: #b8c2ff;
+        color: #2447f9;
+    }
+
+    .rich-editor__surface {
+        background: white;
+        color: #172033;
+        line-height: 1.65;
+        min-height: 180px;
+        outline: none;
+        padding: 14px;
+    }
+
+    .rich-editor__surface:focus {
+        box-shadow: inset 0 0 0 2px rgba(36, 71, 249, 0.22);
+    }
+
+    .rich-editor__surface p,
+    .rich-editor__surface ul,
+    .rich-editor__surface ol,
+    .rich-editor__surface blockquote,
+    .rich-editor__surface h3 {
+        margin: 0 0 12px;
+    }
+
+    .rich-editor__surface ul,
+    .rich-editor__surface ol {
+        padding-left: 22px;
+    }
+
+    .rich-editor__surface blockquote {
+        border-left: 3px solid #2447f9;
+        color: #526071;
+        padding-left: 12px;
+    }
+
+    .rich-editor__surface a {
+        color: #2447f9;
+        font-weight: 700;
+    }
+
+    .rich-editor__input {
+        display: none;
+    }
+
     .paragraphs-header {
         border-top: 1px solid #e6e8ef;
         margin-top: 28px;
@@ -210,6 +290,40 @@
 
     .pagination-wrap {
         padding-top: 18px;
+    }
+
+    html.universe-theme-dark .rich-editor {
+        border-color: #2f3c52;
+    }
+
+    html.universe-theme-dark .rich-editor__toolbar {
+        background: #111827;
+        border-color: #2f3c52;
+    }
+
+    html.universe-theme-dark .rich-editor__button {
+        background: #172033;
+        border-color: #2f3c52;
+        color: #e5e7eb;
+    }
+
+    html.universe-theme-dark .rich-editor__button:hover {
+        background: #22304a;
+        border-color: #5c6fff;
+        color: #c7d2fe;
+    }
+
+    html.universe-theme-dark .rich-editor__surface {
+        background: #172033;
+        color: #e5e7eb;
+    }
+
+    html.universe-theme-dark .rich-editor__surface blockquote {
+        color: #a9b4c6;
+    }
+
+    html.universe-theme-dark .rich-editor__surface a {
+        color: #8ea0ff;
     }
 
     @media (max-width: 720px) {
