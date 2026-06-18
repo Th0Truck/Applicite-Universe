@@ -74,8 +74,9 @@
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
-        "lint": "phpcs --standard=PSR12 app tests",
-        "stan": "phpstan analyse app --level=6",
+        "lint": "vendor/bin/phpcs",
+        "lint:fix": "vendor/bin/phpcbf",
+        "stan": "vendor/bin/phpstan analyse app --level=6",
         "review-check": [
             "@lint",
             "@stan",
