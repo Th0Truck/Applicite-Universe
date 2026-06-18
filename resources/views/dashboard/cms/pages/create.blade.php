@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Page - Universe</title>
-    @include('dashboard.cms.pages.styles')
+    @vite('resources/css/dashboard.css')
 </head>
 <body class="has-universe-topbar">
     @include('components.topbar')
 
     <main class="admin-shell">
         <section class="admin-panel">
+            <x-dashboard-menu />
+
             <div class="admin-header">
                 <div>
                     <h1>Create page</h1>

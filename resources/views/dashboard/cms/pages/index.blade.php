@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pages - Universe</title>
-    @include('dashboard.cms.pages.styles')
+    @vite('resources/css/dashboard.css')
 </head>
 <body class="has-universe-topbar">
     @include('components.topbar')
 
-    <main class="admin-shell">
-        <section class="admin-panel">
+    <main class="dashboard-shell">
+        <section class="dashboard-panel">
+            <h1>Dashboard</h1>
+            <p>Welcome back, {{ auth()->user()->name }}.</p>
+
+            <x-dashboard-menu />
             <div class="admin-header">
                 <div>
                     <h1>Pages</h1>
