@@ -26,6 +26,12 @@ return [
             'settings.view',
             'settings.manage',
         ],
+        'pages' => [
+            'pages.view',
+            'pages.create',
+            'pages.update',
+            'pages.delete',
+        ],
         'security' => [
             'two_factor.enforce',
             'passkeys.manage',
@@ -50,6 +56,10 @@ return [
             'users.create',
             'users.update',
             'roles.view',
+            'pages.view',
+            'pages.create',
+            'pages.update',
+            'pages.delete',
             'settings.view',
             'settings.manage',
             'two_factor.enforce',
@@ -58,6 +68,8 @@ return [
         'manager' => [
             'users.view',
             'users.update',
+            'pages.view',
+            'pages.update',
             'settings.view',
         ],
         'user' => [],

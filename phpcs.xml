@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ruleset name="Project coding standard">
+    <description>PHP CodeSniffer rules for this project</description>
+
+    <rule ref="PSR12"/>
+
+    <file>app</file>
+    <file>tests</file>
+
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>storage/*</exclude-pattern>
+    <exclude-pattern>bootstrap/cache/*</exclude-pattern>
+</ruleset>

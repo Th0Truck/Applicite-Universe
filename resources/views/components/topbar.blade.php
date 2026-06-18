@@ -1,7 +1,8 @@
 @php
-    $dashboardUrl = route('dashboard');
     $currentUser = Auth::user();
     $accountLabel = $currentUser?->name ?? $currentUser?->email;
+    $currentPageSlug = request()->route('slug');
+    $topbarPages = $topbarPages ?? collect();
 @endphp
 
 <style>
@@ -168,7 +169,15 @@
         position: relative;
     }
 
+    .universe-topbar__page {
+        position: relative;
+    }
+
     .universe-topbar__account summary {
+        list-style: none;
+    }
+
+    .universe-topbar__page summary {
         list-style: none;
     }
 
@@ -176,9 +185,17 @@
         display: none;
     }
 
+    .universe-topbar__page summary::-webkit-details-marker {
+        display: none;
+    }
+
     .universe-topbar__account-button {
         gap: 8px;
         max-width: 240px;
+    }
+
+    .universe-topbar__page-button {
+        gap: 8px;
     }
 
     .universe-topbar__account-name {
@@ -207,6 +224,11 @@
         right: 0;
         top: calc(100% + 8px);
         z-index: 60;
+    }
+
+    .universe-topbar__page .universe-topbar__dropdown {
+        left: 0;
+        right: auto;
     }
 
     .universe-topbar__dropdown-header {
@@ -325,9 +347,18 @@
             width: 100%;
         }
 
+        .universe-topbar__page {
+            width: 100%;
+        }
+
         .universe-topbar__account-button {
             justify-content: center;
             max-width: none;
+            width: 100%;
+        }
+
+        .universe-topbar__page-button {
+            justify-content: center;
             width: 100%;
         }
 
@@ -352,18 +383,41 @@
         </label>
 
         <div class="universe-topbar__menu">
-            @auth
-                <a class="universe-topbar__link {{ request()->routeIs('dashboard') ? 'universe-topbar__link--primary' : '' }}" href="{{ $dashboardUrl }}">
-                    Dashboard
-                </a>
-                <a class="universe-topbar__link" href="{{ route('two-factor.show') }}">
-                    Security
-                </a>
-                @can('users.view')
-                    <a class="universe-topbar__link {{ request()->routeIs('dashboard.users.*') ? 'universe-topbar__link--primary' : '' }}" href="{{ route('dashboard.users.index') }}">
-                        Users
+            @foreach ($topbarPages as $topbarPage)
+                @php
+                    $childPages = $topbarPage->children;
+                    $isCurrentPage = $currentPageSlug === $topbarPage->slug || $childPages->contains('slug', $currentPageSlug);
+                @endphp
+
+                @if ($childPages->isNotEmpty())
+                    <details class="universe-topbar__page">
+                        <summary class="universe-topbar__button universe-topbar__page-button {{ $isCurrentPage ? 'universe-topbar__link--primary' : '' }}">
+                            <span>{{ $topbarPage->title }}</span>
+                            <span class="universe-topbar__account-caret" aria-hidden="true"></span>
+                        </summary>
+
+                        <div class="universe-topbar__dropdown">
+                            <a class="universe-topbar__dropdown-item" href="{{ route('cms.pages.show', $topbarPage->slug) }}">
+                                {{ $topbarPage->title }}
+                                <span></span>
+                            </a>
+
+                            @foreach ($childPages as $childPage)
+                                <a class="universe-topbar__dropdown-item" href="{{ route('cms.pages.show', $childPage->slug) }}">
+                                    {{ $childPage->title }}
+                                    <span></span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </details>
+                @else
+                    <a class="universe-topbar__link {{ $isCurrentPage ? 'universe-topbar__link--primary' : '' }}" href="{{ route('cms.pages.show', $topbarPage->slug) }}">
+                        {{ $topbarPage->title }}
                     </a>
-                @endcan
+                @endif
+            @endforeach
+
+            @auth
                 <details class="universe-topbar__account">
                     <summary class="universe-topbar__button universe-topbar__account-button">
                         <span class="universe-topbar__account-name">{{ $accountLabel }}</span>
@@ -377,9 +431,8 @@
                             <span>Appearance</span>
                             <span data-theme-label>Light</span>
                         </button>
-
-                        <a class="universe-topbar__dropdown-item" href="{{ route('two-factor.show') }}">
-                            Security
+                        <a class="universe-topbar__dropdown-item" href="{{ route('dashboard') }}">
+                            Dashboard
                             <span></span>
                         </a>
 
