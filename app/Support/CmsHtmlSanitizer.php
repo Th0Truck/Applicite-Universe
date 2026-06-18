@@ -50,14 +50,15 @@ class CmsHtmlSanitizer
         }
 
         if (! class_exists(DOMDocument::class)) {
-            return strip_tags($html, '<'.implode('><', self::ALLOWED_TAGS).'>');
+            return strip_tags($html, '<' . implode('><', self::ALLOWED_TAGS) . '>');
         }
 
         $document = new DOMDocument('1.0', 'UTF-8');
 
         libxml_use_internal_errors(true);
         $document->loadHTML(
-            '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><div id="cms-fragment">'.$html.'</div></body></html>',
+            '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>'
+                . '<div id="cms-fragment">' . $html . '</div></body></html>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
         );
         libxml_clear_errors();

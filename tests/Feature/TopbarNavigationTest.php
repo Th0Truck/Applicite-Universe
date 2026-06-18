@@ -102,6 +102,6 @@ class TopbarNavigationTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Welcome back, '.$user->name);
+            ->assertSee('Welcome back, ' . $user->name);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse as TwoFactorChallengeViewResponseContract;
+use Symfony\Component\HttpFoundation\Response;
 
 class TwoFactorChallengeViewResponse implements TwoFactorChallengeViewResponseContract
 {
@@ -12,8 +13,8 @@ class TwoFactorChallengeViewResponse implements TwoFactorChallengeViewResponseCo
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
-        return view('auth.two-factor-challenge');
+        return response()->view('auth.two-factor-challenge');
     }
 }

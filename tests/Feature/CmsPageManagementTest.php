@@ -153,7 +153,8 @@ class CmsPageManagementTest extends TestCase
                 'paragraphs' => [
                     [
                         'heading' => 'Formatted paragraph',
-                        'body' => '<p><strong>Safe copy</strong><script>alert("bad")</script><a href="javascript:alert(1)" onclick="bad()">Unsafe link</a></p>',
+                        'body' => '<p><strong>Safe copy</strong><script>alert("bad")</script>'
+                            . '<a href="javascript:alert(1)" onclick="bad()">Unsafe link</a></p>',
                     ],
                 ],
             ])
