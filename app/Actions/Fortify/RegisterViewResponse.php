@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use Laravel\Fortify\Contracts\RegisterViewResponse as RegisterViewResponseContract;
+use Symfony\Component\HttpFoundation\Response;
 
 class RegisterViewResponse implements RegisterViewResponseContract
 {
@@ -12,8 +13,8 @@ class RegisterViewResponse implements RegisterViewResponseContract
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
-        return view('auth.register');
+        return response()->view('auth.register');
     }
 }

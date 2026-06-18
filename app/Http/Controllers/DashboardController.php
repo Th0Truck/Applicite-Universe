@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ->get();
 
         return $this->appendPages(
-            $pages->groupBy(fn (CmsPage $page): string => $this->parentKey($page->parent_id)),
+            $pages->toBase()->groupBy(fn (CmsPage $page): string => $this->parentKey($page->parent_id)),
             $this->parentKey(null),
         );
     }
@@ -40,7 +40,7 @@ class DashboardController extends Controller
     /**
      * Recursively append pages beneath a parent page.
      *
-     * @param  Collection<string, Collection<int, CmsPage>>  $childrenByParent
+     * @param  Collection<int|string, Collection<int, CmsPage>>  $childrenByParent
      * @return Collection<int, array{page: CmsPage, depth: int}>
      */
     private function appendPages(Collection $childrenByParent, string $parentKey, int $depth = 0): Collection

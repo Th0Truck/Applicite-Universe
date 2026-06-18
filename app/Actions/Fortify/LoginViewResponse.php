@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use Laravel\Fortify\Contracts\LoginViewResponse as LoginViewResponseContract;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoginViewResponse implements LoginViewResponseContract
 {
@@ -12,8 +13,8 @@ class LoginViewResponse implements LoginViewResponseContract
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
-        return view('auth.login');
+        return response()->view('auth.login');
     }
 }

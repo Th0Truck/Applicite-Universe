@@ -2,9 +2,7 @@
 
 namespace App\Actions\Fortify;
 
-use Laravel\Fortify\Actions\Action;
-
-class RedirectIfTwoFactorNotConfirmed extends Action
+class RedirectIfTwoFactorNotConfirmed
 {
     /**
      * Handle the incoming request.

@@ -61,7 +61,7 @@ class DashboardPageHierarchyTest extends TestCase
                 '/company-team-history',
             ])
             ->assertSee(route('dashboard.cms.pages.create', ['parent_id' => $company->id]))
-            ->assertSee(route('dashboard.cms.pages.edit', $company).'#paragraphs');
+            ->assertSee(route('dashboard.cms.pages.edit', $company) . '#paragraphs');
     }
 
     /**
