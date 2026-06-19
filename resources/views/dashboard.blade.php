@@ -11,8 +11,6 @@
 
     <main class="dashboard-shell">
         <section class="dashboard-panel">
-            <h1>Dashboard</h1>
-            <p>Welcome back, {{ auth()->user()->name }}.</p>
 
             <x-dashboard-menu />
 
@@ -71,6 +69,8 @@
                 </section>
             @endcan
         </section>
+
+        <x-dashboard-footer />
     </main>
 </body>
 </html>

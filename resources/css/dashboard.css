@@ -6,6 +6,11 @@ body {
     min-height: 100vh;
 }
 
+.dashboard-header {
+    color: #172033;
+    text-decoration: none;
+}
+
 .dashboard-shell {
     margin: 0 auto;
     max-width: 1180px;
@@ -36,7 +41,7 @@ body {
     display: grid;
     gap: 14px;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    margin-top: 24px;
+    margin: 24px 0;
 }
 
 .dashboard-action {
@@ -64,9 +69,12 @@ body {
     font-size: 14px;
 }
 
+html.universe-theme-dark .dashboard-action strong, html.universe-theme-dark .dashboard-action span, html.universe-theme-dark .dashboard-header {
+    color: #e6e8ef;
+}
+
 html.universe-theme-dark .dashboard-action strong, html.universe-theme-dark .dashboard-action span {
     border-color: #2c333f;
-    color: #e6e8ef;
 }
 
 /*** Dashboard Sections */
@@ -516,6 +524,32 @@ textarea.form-control {
 
 .pagination-wrap {
     padding-top: 18px;
+}
+
+.dashboard-footer {
+    align-items: center;
+    color: #526071;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 2px 0;
+}
+
+.dashboard-footer__link {
+    align-items: center;
+    color: #2447f9;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 700;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.dashboard-footer__link:hover {
+    text-decoration: underline;
+}
+
+.dashboard-footer__icon {
+    flex: 0 0 auto;
 }
 
 html.universe-theme-dark .rich-editor {

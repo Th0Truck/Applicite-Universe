@@ -28,6 +28,8 @@
                 @include('dashboard.cms.pages._form', ['buttonLabel' => 'Create page'])
             </form>
         </section>
+
+        <x-dashboard-footer />
     </main>
 </body>
 </html>

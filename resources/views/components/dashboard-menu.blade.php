@@ -1,3 +1,6 @@
+<h1><a class="dashboard-header" href="{{ route('dashboard') }}">Dashboard</a></h1>
+<p>Welcome back, {{ auth()->user()->name }}.</p>
+
 <div class="dashboard-actions">
     @can('users.view')
         <x-dashboard-action

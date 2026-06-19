@@ -6,6 +6,7 @@
 - Prefer simple, readable, maintainable solutions over clever abstractions.
 - Do not suggest rewrites unless the current implementation is risky or hard to maintain.
 - Be strict about security, data integrity and backwards compatibility.
+- Keep in mind Separation of Concerns
 
 ## PHP standards
 - Follow PSR-12 coding style.

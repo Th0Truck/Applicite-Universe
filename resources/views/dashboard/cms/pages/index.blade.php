@@ -11,9 +11,6 @@
 
     <main class="dashboard-shell">
         <section class="dashboard-panel">
-            <h1>Dashboard</h1>
-            <p>Welcome back, {{ auth()->user()->name }}.</p>
-
             <x-dashboard-menu />
             <div class="admin-header">
                 <div>
@@ -78,7 +75,10 @@
             <div class="pagination-wrap">
                 {{ $pages->links() }}
             </div>
+            <a class="admin-link" href="{{ route('dashboard') }}">Back to dashboard</a>
         </section>
+
+        <x-dashboard-footer />
     </main>
 </body>
 </html>

@@ -84,6 +84,8 @@
                 </form>
             @endcan
         </section>
+
+        <x-dashboard-footer />
     </main>
 </body>
 </html>
