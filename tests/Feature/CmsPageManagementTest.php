@@ -306,6 +306,91 @@ class CmsPageManagementTest extends TestCase
     }
 
     /**
+     * Public pages include a footer with published sub-pages from the top-level page.
+     */
+    public function test_public_page_footer_lists_published_sub_pages_for_top_level_page(): void
+    {
+        $parent = CmsPage::create([
+            'title' => 'Company',
+            'slug' => 'company',
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        $team = CmsPage::create([
+            'parent_id' => $parent->id,
+            'title' => 'Team',
+            'slug' => 'company-team',
+            'sort_order' => 1,
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        CmsPage::create([
+            'parent_id' => $parent->id,
+            'title' => 'Careers',
+            'slug' => 'company-careers',
+            'sort_order' => 0,
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        CmsPage::create([
+            'parent_id' => $parent->id,
+            'title' => 'Draft Child',
+            'slug' => 'company-draft-child',
+            'template' => 'standard',
+            'is_published' => false,
+        ]);
+
+        $this->get(route('cms.pages.show', $parent->slug))
+            ->assertOk()
+            ->assertSee('Explore')
+            ->assertSee('Company')
+            ->assertSeeInOrder(['Careers', 'Team'])
+            ->assertSee(route('cms.pages.show', $team->slug))
+            ->assertDontSee('Draft Child');
+    }
+
+    /**
+     * Sub-pages show the same top-level footer and mark the current sub-page.
+     */
+    public function test_public_sub_page_footer_lists_sibling_sub_pages(): void
+    {
+        $parent = CmsPage::create([
+            'title' => 'About',
+            'slug' => 'about',
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        $team = CmsPage::create([
+            'parent_id' => $parent->id,
+            'title' => 'Team',
+            'slug' => 'about-team',
+            'sort_order' => 0,
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        CmsPage::create([
+            'parent_id' => $parent->id,
+            'title' => 'History',
+            'slug' => 'about-history',
+            'sort_order' => 1,
+            'template' => 'standard',
+            'is_published' => true,
+        ]);
+
+        $this->get(route('cms.pages.show', $team->slug))
+            ->assertOk()
+            ->assertSee('About')
+            ->assertSee('Team')
+            ->assertSee('History')
+            ->assertSee('aria-current="page"', false);
+    }
+
+    /**
      * Draft pages are not publicly available.
      */
     public function test_draft_page_is_not_publicly_available(): void
