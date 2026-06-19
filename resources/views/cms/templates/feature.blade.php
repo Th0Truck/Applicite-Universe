@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $page->title }} - Universe</title>
-    @include('cms.templates.styles')
+    @vite('resources/css/frontend.css')
 </head>
 <body class="cms-page has-universe-topbar">
     @include('components.topbar')
@@ -28,6 +28,12 @@
                 </div>
             </section>
         @endforeach
+
+        <x-frontend-page-footer
+            :current-page="$page"
+            :sub-pages="$footerSubPages"
+            :top-level-page="$topLevelPage"
+        />
     </main>
 </body>
 </html>

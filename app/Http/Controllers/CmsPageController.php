@@ -117,15 +117,18 @@ class CmsPageController extends Controller
     public function show(string $slug): View
     {
         $page = CmsPage::query()
-            ->with('paragraphs')
+            ->with(['paragraphs', 'parent'])
             ->where('slug', $slug)
             ->where('is_published', true)
             ->firstOrFail();
 
         $template = config("cms.templates.{$page->template}.view", 'cms.templates.standard');
+        $topLevelPage = $page->parent ?? $page;
 
         return view($template, [
             'page' => $page,
+            'topLevelPage' => $topLevelPage,
+            'footerSubPages' => $this->publishedSubPages($topLevelPage),
         ]);
     }
 
@@ -261,6 +264,20 @@ class CmsPageController extends Controller
         return ((int) CmsPage::query()
             ->where('parent_id', $parentId)
             ->max('sort_order')) + 1;
+    }
+
+    /**
+     * Get published sub-pages for a top-level page.
+     *
+     * @return Collection<int, CmsPage>
+     */
+    private function publishedSubPages(CmsPage $topLevelPage): Collection
+    {
+        return $topLevelPage->children()
+            ->where('is_published', true)
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
     }
 
     /**
