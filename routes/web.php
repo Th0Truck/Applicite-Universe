@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/styleguide', 'styleguide')
+    ->middleware('auth')
+    ->name('styleguide');
+
 Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
