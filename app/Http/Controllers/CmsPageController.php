@@ -275,8 +275,6 @@ class CmsPageController extends Controller
     {
         return $topLevelPage->children()
             ->where('is_published', true)
-            ->orderBy('sort_order')
-            ->orderBy('title')
             ->get();
     }
 
