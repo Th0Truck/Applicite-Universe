@@ -39,6 +39,29 @@ Pay special attention to:
 - unsafe redirects
 - missing CSRF protection
 
+## Design rules
+
+When implementing backend/admin/dashboard views, follow:
+
+- `docs/design/dashboard.md`
+
+Treat that file as the source of truth for:
+- dashboard layout
+- topbar structure
+- main navigation
+- quicklink/sidebar behavior
+- content/form area structure
+
+Do not invent a different layout unless the user explicitly asks for it.
+
+## Implementation expectations
+
+- Keep layout components reusable.
+- Use semantic HTML where possible.
+- Separate layout structure, styling and business logic.
+- Preserve existing framework conventions.
+- Ask before changing the visual hierarchy described in the design file.
+
 ## Review output format
 When reviewing code, respond in Danish.
 
