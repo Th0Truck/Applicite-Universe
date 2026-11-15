@@ -405,4 +405,115 @@ class CmsPageManagementTest extends TestCase
         $this->get(route('cms.pages.show', 'draft-page'))
             ->assertNotFound();
     }
+    /**
+     * Generated and normalized slugs must be unique and nonempty.
+     */
+    public function test_slug_validation_uses_the_persisted_value(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        CmsPage::create(['title' => 'Existing', 'slug' => 'existing', 'template' => 'standard']);
+
+        foreach (['Existing!', '', '!!!'] as $slug) {
+            $this->actingAs($admin)->post(route('dashboard.cms.pages.store'), [
+                'title' => 'Existing',
+                'slug' => $slug,
+                'template' => 'standard',
+            ])->assertSessionHasErrors('slug');
+        }
+
+        $this->assertDatabaseCount('cms_pages', 1);
+    }
+
+    /**
+     * Paragraph IDs must belong to the edited page and appear only once.
+     */
+    public function test_paragraph_ids_are_scoped_and_distinct(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $page = CmsPage::create(['title' => 'Page', 'slug' => 'page', 'template' => 'standard']);
+        $other = CmsPage::create(['title' => 'Other', 'slug' => 'other', 'template' => 'standard']);
+        $foreign = $other->paragraphs()->create(['heading' => 'Foreign', 'body' => '']);
+        $own = $page->paragraphs()->create(['heading' => 'Own', 'body' => '']);
+
+        foreach ([[$foreign->id], [$own->id, $own->id]] as $ids) {
+            $this->actingAs($admin)->put(route('dashboard.cms.pages.update', $page), [
+                'title' => 'Changed',
+                'slug' => $page->slug,
+                'template' => 'standard',
+                'paragraphs' => array_map(fn (int $id): array => ['id' => $id, 'heading' => 'Changed'], $ids),
+            ])->assertSessionHasErrors('paragraphs.0.id');
+        }
+
+        $this->assertSame('Page', $page->fresh()->title);
+        $this->assertSame('Foreign', $foreign->fresh()->heading);
+        $this->assertSame('Own', $own->fresh()->heading);
+    }
+
+    /**
+     * Image-only paragraphs survive both creation and subsequent edits.
+     */
+    public function test_image_only_paragraph_is_preserved(): void
+    {
+        Storage::fake('public');
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $attributes = ['title' => 'Images', 'slug' => 'images', 'template' => 'standard'];
+
+        $this->actingAs($admin)->post(route('dashboard.cms.pages.store'), $attributes + [
+            'paragraphs' => [['image' => UploadedFile::fake()->image('photo.jpg')]],
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $page = CmsPage::where('slug', 'images')->firstOrFail();
+        $paragraph = $page->paragraphs()->firstOrFail();
+        Storage::disk('public')->assertExists($paragraph->image_path);
+
+        $this->put(route('dashboard.cms.pages.update', $page), $attributes + [
+            'paragraphs' => [['id' => $paragraph->id]],
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $this->assertDatabaseHas('cms_paragraphs', ['id' => $paragraph->id]);
+        Storage::disk('public')->assertExists($paragraph->image_path);
+    }
+
+    /**
+     * A failed paragraph write rolls back content and cleans only new images.
+     */
+    public function test_failed_save_preserves_existing_content_and_images(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('cms/original.jpg', 'original');
+        $page = CmsPage::create(['title' => 'Original', 'slug' => 'original', 'template' => 'standard']);
+        $paragraph = $page->paragraphs()->create([
+            'heading' => 'Original', 'body' => '', 'image_path' => 'cms/original.jpg',
+        ]);
+        $event = 'eloquent.saving: ' . \App\Models\CmsParagraph::class;
+        \Illuminate\Support\Facades\Event::listen($event, function (): void {
+            throw new \RuntimeException('Simulated persistence failure');
+        });
+
+        try {
+            app(\App\Actions\SaveCmsPage::class)->save($page, [
+                'title' => 'Changed', 'slug' => 'original', 'template' => 'standard',
+                'paragraphs' => [[
+                    'id' => $paragraph->id,
+                    'heading' => 'Changed',
+                    'image' => UploadedFile::fake()->image('replacement.jpg'),
+                ]],
+            ]);
+            $this->fail('The persistence failure should propagate.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Simulated persistence failure', $exception->getMessage());
+        } finally {
+            \Illuminate\Support\Facades\Event::forget($event);
+        }
+
+        $this->assertSame('Original', $page->fresh()->title);
+        $this->assertSame('Original', $paragraph->fresh()->heading);
+        $this->assertSame(['cms/original.jpg'], Storage::disk('public')->allFiles('cms'));
+    }
 }

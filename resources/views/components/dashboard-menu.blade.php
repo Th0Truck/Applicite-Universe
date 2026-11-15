@@ -18,6 +18,14 @@
         />
     @endcan
 
+    @can('galleries.view')
+        <x-dashboard-action
+            :href="route('dashboard.galleries.index')"
+            label="Galleries"
+            description="Upload images and attach them to galleries."
+        />
+    @endcan
+
     <x-dashboard-action
         :href="route('two-factor.show')"
         label="Security"

@@ -29,9 +29,12 @@ class UserRightsTest extends TestCase
         $this->assertTrue($admin->can('settings.manage'));
         $this->assertTrue($admin->can('passkeys.manage'));
         $this->assertTrue($admin->can('pages.create'));
+        $this->assertTrue($admin->can('galleries.create'));
         $this->assertTrue($manager->can('users.view'));
         $this->assertTrue($manager->can('pages.update'));
+        $this->assertTrue($manager->can('galleries.update'));
         $this->assertFalse($manager->can('pages.create'));
+        $this->assertFalse($manager->can('galleries.create'));
         $this->assertFalse($manager->can('settings.manage'));
     }
 
