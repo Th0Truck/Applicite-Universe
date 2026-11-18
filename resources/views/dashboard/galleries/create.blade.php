@@ -16,14 +16,14 @@
             <div class="admin-header">
                 <div>
                     <h1>Create gallery</h1>
-                    <p>Upload and attach images for frontend use.</p>
+                    <p>Create the gallery first, then upload or attach images on the edit page.</p>
                 </div>
                 <a class="admin-link" href="{{ route('dashboard.galleries.index') }}">Back to galleries</a>
             </div>
 
             @include('dashboard.cms.pages.errors')
 
-            <form method="POST" action="{{ route('dashboard.galleries.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('dashboard.galleries.store') }}">
                 @csrf
                 @include('dashboard.galleries._form', ['buttonLabel' => 'Create gallery'])
             </form>

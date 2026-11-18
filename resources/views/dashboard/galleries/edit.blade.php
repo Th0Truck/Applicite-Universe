@@ -27,11 +27,13 @@
 
             @include('dashboard.cms.pages.errors')
 
-            <form method="POST" action="{{ route('dashboard.galleries.update', $gallery) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('dashboard.galleries.update', $gallery) }}">
                 @csrf
                 @method('PUT')
                 @include('dashboard.galleries._form', ['buttonLabel' => 'Save gallery'])
             </form>
+
+            @include('dashboard.galleries._images')
         </section>
 
         <x-dashboard-footer />

@@ -20,9 +20,9 @@
 
 ## Resterende fund uden for CMS-refaktoreringen
 
-### High
+### Løst ved adskillelse af galleriets billedhåndtering
 
-- `app/Http/Controllers/DashboardGalleryController.php:50` og `:79`: Galleri, uploadmetadata og billedtilknytninger gemmes separat. Fejl under upload eller tilknytning kan efterlade en delvist gemt ændring eller ubrugte filer. Flyt lagring til en handling med transaktion og oprydning, og tilføj tests med simulerede fejl.
+Galleriets oplysninger gemmes nu separat. Upload og tilknytning har egne formularer og ruter på redigeringssiden. Upload af flere billeder bruger en databasetransaktion og fjerner nye filer ved exceptions. Valg af eksisterende billeder gemmes i en selvstændig transaktion. Regressionstests dækker rollback, rettigheder og bevaring af eksisterende tilknytninger.
 
 ### Medium
 
@@ -30,7 +30,7 @@
 
 ## Verifikation og afgrænsning
 
-`composer review-check` består: PSR-12, PHPStan uden fejl samt 47 tests med 202 assertions. Composer kører aktuelt testsuiten to gange.
+`composer review-check` består: PSR-12, PHPStan uden fejl samt 52 tests med 243 assertions efter adskillelse af galleriets billedhåndtering. Composer kører aktuelt testsuiten to gange.
 
 Gennemgangen fokuserede på CMS-controlleren, dens validering, lagring, ruter og tests samt status for det lokale galleriarbejde. Dette er ikke en fuld sikkerhedsrevision af hele projektet. Browser og produktionsdatabase er ikke testet.
 

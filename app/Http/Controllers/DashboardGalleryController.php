@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use App\Models\GalleryImage;
-use App\Support\GalleryImageUploader;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class DashboardGalleryController extends Controller
 {
-    public function __construct(private readonly GalleryImageUploader $uploader)
-    {
-    }
-
     /**
      * Display galleries in the dashboard.
      */
@@ -39,8 +33,6 @@ class DashboardGalleryController extends Controller
     {
         return view('dashboard.galleries.create', [
             'gallery' => new Gallery(['is_published' => true]),
-            'images' => $this->imageOptions(),
-            'attachedImageIds' => collect(),
         ]);
     }
 
@@ -51,8 +43,6 @@ class DashboardGalleryController extends Controller
     {
         $validated = $this->validatedGallery($request);
         $gallery = Gallery::create($this->galleryAttributes($validated));
-
-        $this->syncImages($request, $gallery, Arr::get($validated, 'image_ids', []));
 
         return redirect()
             ->route('dashboard.galleries.edit', $gallery)
@@ -81,7 +71,6 @@ class DashboardGalleryController extends Controller
         $validated = $this->validatedGallery($request, $gallery);
 
         $gallery->update($this->galleryAttributes($validated));
-        $this->syncImages($request, $gallery, Arr::get($validated, 'image_ids', []));
 
         return redirect()
             ->route('dashboard.galleries.edit', $gallery)
@@ -117,11 +106,6 @@ class DashboardGalleryController extends Controller
             ],
             'description' => ['nullable', 'string', 'max:2000'],
             'is_published' => ['nullable', 'boolean'],
-            'image_ids' => ['array'],
-            'image_ids.*' => ['integer', 'exists:gallery_images,id'],
-            'new_images' => ['array'],
-            'new_images.*' => ['image', 'max:4096'],
-            'new_image_alt_text' => ['nullable', 'string', 'max:255'],
         ]);
     }
 
@@ -141,33 +125,6 @@ class DashboardGalleryController extends Controller
             'description' => $validated['description'] ?? null,
             'is_published' => (bool) ($validated['is_published'] ?? false),
         ];
-    }
-
-    /**
-     * Synchronize selected and newly uploaded images for a gallery.
-     *
-     * @param  array<int, int|string>  $selectedImageIds
-     */
-    private function syncImages(Request $request, Gallery $gallery, array $selectedImageIds): void
-    {
-        $imageIds = collect($selectedImageIds)
-            ->map(fn (int|string $imageId): int => (int) $imageId)
-            ->unique()
-            ->values();
-
-        foreach ($request->file('new_images', []) as $file) {
-            $imageIds->push($this->uploader->upload($file, $request->input('new_image_alt_text'))->id);
-        }
-
-        $syncPayload = $imageIds
-            ->unique()
-            ->values()
-            ->mapWithKeys(fn (int $imageId, int $index): array => [
-                $imageId => ['sort_order' => $index],
-            ])
-            ->all();
-
-        $gallery->images()->sync($syncPayload);
     }
 
     /**
