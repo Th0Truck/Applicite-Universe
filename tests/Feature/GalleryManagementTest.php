@@ -339,4 +339,31 @@ class GalleryManagementTest extends TestCase
 
         $this->assertDatabaseCount('gallery_images', 0);
     }
+    /**
+     * Normalized slugs reject collisions and empty values before persistence.
+     */
+    public function test_gallery_slug_validation_uses_the_normalized_value(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $existing = Gallery::create(['title' => 'Existing', 'slug' => 'existing']);
+        $other = Gallery::create(['title' => 'Other', 'slug' => 'other']);
+
+        foreach (['Existing!', '', '!!!'] as $slug) {
+            $this->actingAs($admin)->post(route('dashboard.galleries.store'), [
+                'title' => 'Existing', 'slug' => $slug,
+            ])->assertSessionHasErrors('slug');
+            $this->put(route('dashboard.galleries.update', $other), [
+                'title' => 'Existing', 'slug' => $slug,
+            ])->assertSessionHasErrors('slug');
+        }
+
+        $this->put(route('dashboard.galleries.update', $existing), [
+            'title' => 'Existing', 'slug' => 'Existing!',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertSame('existing', $existing->fresh()->slug);
+        $this->assertSame('Other', $other->fresh()->title);
+        $this->assertDatabaseCount('galleries', 2);
+    }
 }

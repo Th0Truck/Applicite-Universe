@@ -6,10 +6,8 @@ use App\Models\Gallery;
 use App\Models\GalleryImage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Http\Requests\SaveGalleryRequest;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class DashboardGalleryController extends Controller
 {
@@ -39,9 +37,9 @@ class DashboardGalleryController extends Controller
     /**
      * Store a newly created gallery.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(SaveGalleryRequest $request): RedirectResponse
     {
-        $validated = $this->validatedGallery($request);
+        $validated = $request->validated();
         $gallery = Gallery::create($this->galleryAttributes($validated));
 
         return redirect()
@@ -66,9 +64,9 @@ class DashboardGalleryController extends Controller
     /**
      * Update an existing gallery.
      */
-    public function update(Request $request, Gallery $gallery): RedirectResponse
+    public function update(SaveGalleryRequest $request, Gallery $gallery): RedirectResponse
     {
-        $validated = $this->validatedGallery($request, $gallery);
+        $validated = $request->validated();
 
         $gallery->update($this->galleryAttributes($validated));
 
@@ -90,26 +88,6 @@ class DashboardGalleryController extends Controller
     }
 
     /**
-     * Validate gallery input.
-     *
-     * @return array<string, mixed>
-     */
-    private function validatedGallery(Request $request, ?Gallery $gallery = null): array
-    {
-        return $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'slug' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('galleries', 'slug')->ignore($gallery?->id),
-            ],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'is_published' => ['nullable', 'boolean'],
-        ]);
-    }
-
-    /**
      * Prepare gallery attributes for persistence.
      *
      * @param  array<string, mixed>  $validated
@@ -117,11 +95,9 @@ class DashboardGalleryController extends Controller
      */
     private function galleryAttributes(array $validated): array
     {
-        $slug = trim((string) ($validated['slug'] ?? ''));
-
         return [
             'title' => $validated['title'],
-            'slug' => Str::slug($slug !== '' ? $slug : $validated['title']),
+            'slug' => $validated['slug'],
             'description' => $validated['description'] ?? null,
             'is_published' => (bool) ($validated['is_published'] ?? false),
         ];

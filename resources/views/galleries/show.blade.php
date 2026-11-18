@@ -24,11 +24,11 @@
                 <figure class="gallery-image">
                     <a class="image-hover-frame" href="{{ Storage::url($image->path) }}"
                        aria-label="{{ $image->alt_text ?: 'View image ' . $loop->iteration }}">
-                       <div class="image-hover-border">
+                        <div class="image-hover-border">
                             <span class="image-hover-box" aria-hidden="true"></span>
                             <img src="{{ Storage::url($image->path) }}" alt="{{ $image->alt_text }}"
                              loading="{{ $loop->first ? 'eager' : 'lazy' }}" decoding="async">
-                       </div>
+                        </div>
                     </a>
                 </figure>
             @empty
@@ -36,5 +36,7 @@
             @endforelse
         </div>
     </main>
+
+    @include('galleries._viewer')
 </body>
 </html>

@@ -24,13 +24,19 @@
 
 Galleriets oplysninger gemmes nu separat. Upload og tilknytning har egne formularer og ruter på redigeringssiden. Upload af flere billeder bruger en databasetransaktion og fjerner nye filer ved exceptions. Valg af eksisterende billeder gemmes i en selvstændig transaktion. Regressionstests dækker rollback, rettigheder og bevaring af eksisterende tilknytninger.
 
-### Medium
+### Løst ved gallerirefaktorering — 2026-11-18
 
-- `app/Http/Controllers/DashboardGalleryController.php:108` og `:134`: Slug valideres før normalisering. En automatisk eller normaliseret slug kan kollidere med en eksisterende slug og give databasefejl. Normaliser før unikhedsvalideringen, og test både oprettelse og opdatering.
+- `SaveGalleryRequest` normaliserer slugs før validering. Tests dækker konflikter ved oprettelse og opdatering, tomme slugs og genbrug af galleriets egen slug.
+- Frontendens hover-animation og billedvisning er adskilt i JavaScript-moduler. Billedvisningen har eget stylesheet og Blade-partial.
+- `npm test` kører JavaScript-tests for retninger, afbrudt animation, reduceret bevægelse, dialogens åbning/lukning, fokus og modificerede klik.
+- Tastaturfokus nulstiller hover-lagets transform, så det ikke bliver stående uden for billedet efter brug af musen.
+- Den samlede testsuite afslørede, at CMS-controlleren igen brugte den gamle validering og lagring. Controlleren er koblet tilbage til de eksisterende `SaveCmsPageRequest` og `SaveCmsPage`, og dubleret kode er fjernet.
 
 ## Verifikation og afgrænsning
 
-`composer review-check` består: PSR-12, PHPStan uden fejl samt 52 tests med 243 assertions efter adskillelse af galleriets billedhåndtering. Composer kører aktuelt testsuiten to gange.
+`composer review-check` består: PSR-12, PHPStan uden fejl samt 54 tests med 263 assertions efter gallerirefaktoreringen. Composer kører aktuelt testsuiten to gange.
+
+`npm test` (7 JavaScript-tests) og `npm run build` består også. JavaScript-testene bruger DOM-doubler; visuel rendering og native dialogadfærd er ikke browsertestet.
 
 Gennemgangen fokuserede på CMS-controlleren, dens validering, lagring, ruter og tests samt status for det lokale galleriarbejde. Dette er ikke en fuld sikkerhedsrevision af hele projektet. Browser og produktionsdatabase er ikke testet.
 
