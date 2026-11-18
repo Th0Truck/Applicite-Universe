@@ -43,7 +43,6 @@ for (const border of document.querySelectorAll('.gallery .image-hover-border')) 
     }
 
     let animation = null;
-    let previousEdge = null;
 
     /**
      * Replace the current animation and retain its destination after completion.
@@ -61,32 +60,11 @@ for (const border of document.querySelectorAll('.gallery .image-hover-border')) 
         );
     };
 
-    /**
-     * Report the closest edge without logging every pointer movement.
-     *
-     * @param {PointerEvent} event
-     * @returns {'oppe'|'nede'|'venstre'|'højre'}
-     */
-    const logEdge = (event) => {
-        const edge = nearestEdge(border.getBoundingClientRect(), event.clientX, event.clientY);
-
-        if (edge !== previousEdge) {
-            console.log('Gallery border:', edge);
-            previousEdge = edge;
-        }
-
-        return edge;
-    };
-
     border.addEventListener('pointerenter', (event) => {
         if (event.pointerType === 'mouse') {
-            slide([edgeTransform(logEdge(event)), 'translate(0, 0)']);
-        }
-    });
+            const edge = nearestEdge(border.getBoundingClientRect(), event.clientX, event.clientY);
 
-    border.addEventListener('pointermove', (event) => {
-        if (event.pointerType === 'mouse') {
-            logEdge(event);
+            slide([edgeTransform(edge), 'translate(0, 0)']);
         }
     });
 
@@ -95,7 +73,7 @@ for (const border of document.querySelectorAll('.gallery .image-hover-border')) 
             return;
         }
 
-        const edge = logEdge(event);
+        const edge = nearestEdge(border.getBoundingClientRect(), event.clientX, event.clientY);
         const currentTransform = getComputedStyle(box).transform;
 
         // Finish an interrupted entry along its axis before exiting along the new axis.
@@ -105,6 +83,5 @@ for (const border of document.querySelectorAll('.gallery .image-hover-border')) 
             : ['translate(0, 0)', edgeTransform(edge)];
 
         slide(transforms);
-        previousEdge = null;
     });
 }
