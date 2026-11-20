@@ -35,6 +35,7 @@
                 <p class="gallery-empty">No images have been added to this gallery yet.</p>
             @endforelse
         </div>
+        <x-frontend-page-footer />
     </main>
 
     @include('galleries._viewer')

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['parent_id', 'sort_order', 'title', 'slug', 'template', 'is_published'])]
+#[Fillable(['parent_id', 'sort_order', 'title', 'slug', 'template', 'is_published', 'show_in_menu'])]
 class CmsPage extends Model
 {
     /**
@@ -53,6 +53,7 @@ class CmsPage extends Model
     {
         return [
             'is_published' => 'boolean',
+            'show_in_menu' => 'boolean',
         ];
     }
 }

@@ -115,5 +115,6 @@
             </form>
         @endif
     </main>
+    <x-frontend-page-footer />
 </body>
 </html>

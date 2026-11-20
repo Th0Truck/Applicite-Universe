@@ -367,3 +367,88 @@ html.universe-theme-dark .universe-topbar__toggle-button span::after {
         width: 100%;
     }
 }
+
+/* Shared site footer, including pages without CMS content. */
+.cms-footer {
+    background: #fff;
+    border: 1px solid #e6e8ef;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #172033;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin-top: 28px;
+    padding: 24px 26px;
+}
+
+.cms-footer__site-info {
+    border-top: 1px solid #e6e8ef;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-top: 20px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.cms-footer__site-info:first-child {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.cms-footer__site-info p {
+    margin: 0 0 8px;
+}
+
+.cms-footer__site-info ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    justify-content: center;
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+}
+
+.cms-footer__site-info a {
+    color: #2447f9;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Reserve the footer's measured height so the final content remains reachable. */
+body:has(.cms-footer) {
+    box-sizing: border-box;
+    padding-bottom: calc(var(--site-footer-height, 220px) + 24px);
+}
+
+html:has(.cms-footer) {
+    scroll-padding-bottom: calc(var(--site-footer-height, 220px) + 24px);
+}
+
+body .cms-footer {
+    border-radius: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    max-height: 40dvh;
+    max-width: none;
+    overflow-y: auto;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    position: fixed;
+    width: 100%;
+    z-index: 40;
+}
+
+html.universe-theme-dark .cms-footer {
+    background: #172033;
+    border-color: #2f3c52;
+    color: #e5e7eb;
+}
+
+html.universe-theme-dark .cms-footer__site-info {
+    border-color: #2f3c52;
+}
+
+html.universe-theme-dark .cms-footer__site-info a {
+    color: #8ea0ff;
+}

@@ -122,5 +122,6 @@
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
     </script>
+    <x-frontend-page-footer />
 </body>
 </html>

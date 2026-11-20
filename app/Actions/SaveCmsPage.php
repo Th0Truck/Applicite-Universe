@@ -37,6 +37,7 @@ class SaveCmsPage
                     'slug' => $attributes['slug'],
                     'template' => $attributes['template'],
                     'is_published' => (bool) ($attributes['is_published'] ?? false),
+                    'show_in_menu' => (bool) ($attributes['show_in_menu'] ?? $page->show_in_menu ?? true),
                 ])->save();
 
                 $this->syncParagraphs($page, $attributes['paragraphs'] ?? [], $uploadedPaths, $obsoletePaths);

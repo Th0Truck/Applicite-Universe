@@ -38,10 +38,12 @@ class AppServiceProvider extends ServiceProvider
             $view->with('topbarPages', CmsPage::query()
                 ->with(['children' => fn ($query) => $query
                     ->where('is_published', true)
+                    ->where('show_in_menu', true)
                     ->orderBy('sort_order')
                     ->orderBy('title')])
                 ->whereNull('parent_id')
                 ->where('is_published', true)
+                ->where('show_in_menu', true)
                 ->orderBy('sort_order')
                 ->orderBy('title')
                 ->get());

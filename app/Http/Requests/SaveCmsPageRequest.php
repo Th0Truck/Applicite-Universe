@@ -57,6 +57,7 @@ class SaveCmsPageRequest extends FormRequest
             ],
             'template' => ['required', Rule::in(array_keys(config('cms.templates')))],
             'is_published' => ['nullable', 'boolean'],
+            'show_in_menu' => ['sometimes', 'boolean'],
             'paragraphs' => ['array'],
             'paragraphs.*' => ['array'],
             'paragraphs.*.id' => [
