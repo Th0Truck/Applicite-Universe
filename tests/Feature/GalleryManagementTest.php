@@ -366,4 +366,61 @@ class GalleryManagementTest extends TestCase
         $this->assertSame('Other', $other->fresh()->title);
         $this->assertDatabaseCount('galleries', 2);
     }
+    /**
+     * Invalid selections leave existing attachments untouched; valid selections preserve order.
+     */
+    public function test_image_selection_validation_and_order(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $gallery = Gallery::create(['title' => 'Gallery', 'slug' => 'gallery']);
+        $first = GalleryImage::create(['path' => 'galleries/first.jpg']);
+        $second = GalleryImage::create(['path' => 'galleries/second.jpg']);
+        $gallery->images()->attach($first, ['sort_order' => 0]);
+        $url = route('dashboard.galleries.images.update', $gallery);
+
+        $this->actingAs($admin)->put($url, ['image_ids' => []])
+            ->assertSessionHasErrors('image_selection');
+        $this->put($url, ['image_selection' => '1', 'image_ids' => [$second->id, $second->id]])
+            ->assertSessionHasErrors('image_ids.0');
+        $this->assertSame([$first->id], $gallery->images()->pluck('gallery_images.id')->all());
+
+        $this->put($url, ['image_selection' => '1', 'image_ids' => [$second->id, $first->id]])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertSame([$second->id, $first->id], $gallery->images()->pluck('gallery_images.id')->all());
+        $this->assertSame([0, 1], $gallery->images()->get()->pluck('pivot.sort_order')->all());
+    }
+
+    /**
+     * A publication choice survives unrelated validation errors and can be saved afterwards.
+     */
+    public function test_unpublished_choice_survives_validation_errors(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $gallery = Gallery::create(['title' => 'Gallery', 'slug' => 'gallery', 'is_published' => true]);
+        $editUrl = route('dashboard.galleries.edit', $gallery);
+
+        $this->actingAs($admin)->from($editUrl)->put(route('dashboard.galleries.update', $gallery), [
+            'title' => '', 'slug' => 'gallery', 'is_published' => '0',
+        ])->assertSessionHasErrors('title')->assertRedirect($editUrl);
+
+        $response = $this->get($editUrl)->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/type="hidden" name="is_published" value="0"/',
+            $response->getContent()
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/<input[^>]*id="is_published"[^>]*checked/',
+            $response->getContent()
+        );
+        $this->assertTrue($gallery->fresh()->is_published);
+
+        $this->put(route('dashboard.galleries.update', $gallery), [
+            'title' => 'Gallery', 'slug' => 'gallery', 'is_published' => '0',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertFalse($gallery->fresh()->is_published);
+    }
 }

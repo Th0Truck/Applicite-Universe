@@ -14,9 +14,10 @@
         <textarea class="form-control text-[#706f6c] dark:text-[#A1A09A]" id="description" name="description" rows="4">{{ old('description', $gallery->description) }}</textarea>
     </div>
 
-    <label class="checkbox-line">
-        <input type="checkbox" name="is_published" value="1" @checked(old('is_published', $gallery->is_published))>
-        <label for="is_published" class="form-label text-[#706f6c] dark:text-[#A1A09A]">Published</label>
+    <input type="hidden" name="is_published" value="0">
+    <label class="checkbox-line" for="is_published">
+        <input type="checkbox" id="is_published" name="is_published" value="1" @checked(old('is_published', $gallery->is_published))>
+        <span class="form-label text-[#706f6c] dark:text-[#A1A09A]">Published</span>
     </label>
 </div>
 

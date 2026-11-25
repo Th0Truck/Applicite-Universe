@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SaveGalleryRequest;
 use App\Models\Gallery;
 use App\Models\GalleryImage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\SaveGalleryRequest;
 use Illuminate\Support\Collection;
 
 class DashboardGalleryController extends Controller
