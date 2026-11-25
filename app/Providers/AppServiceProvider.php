@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\CmsPage;
+use App\Models\Gallery;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
@@ -29,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('components.topbar', function ($view): void {
+            $isFrontend = request()->is('/') || request()->routeIs('cms.pages.show', 'galleries.show');
+
+            $view->with('topbarGalleries', $isFrontend && Schema::hasTable('galleries')
+                ? Gallery::query()->published()->orderBy('title')->orderBy('id')->get(['id', 'title', 'slug'])
+                : collect());
+
             if (! Schema::hasTable('cms_pages')) {
                 $view->with('topbarPages', collect());
 

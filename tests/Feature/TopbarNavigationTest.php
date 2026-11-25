@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CmsPage;
+use App\Models\Gallery;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -103,5 +104,55 @@ class TopbarNavigationTest extends TestCase
             ->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Welcome back, ' . $user->name);
+    }
+    /**
+     * Galleries have a separate dropdown containing only published destinations.
+     */
+    public function test_gallery_dropdown_lists_only_published_galleries(): void
+    {
+        Gallery::create(['title' => 'Winter gallery', 'slug' => 'winter', 'is_published' => true]);
+        Gallery::create(['title' => 'Autumn gallery', 'slug' => 'autumn', 'is_published' => true]);
+        Gallery::create(['title' => 'Private gallery', 'slug' => 'private', 'is_published' => false]);
+
+        $this->get('/')->assertOk()
+            ->assertSee('<span>Galleries</span>', false)
+            ->assertSeeInOrder(['Autumn gallery', 'Winter gallery'])
+            ->assertSee(route('galleries.show', 'autumn'))
+            ->assertSee(route('galleries.show', 'winter'))
+            ->assertDontSee('Private gallery');
+
+        $this->get(route('login'))->assertOk()->assertDontSee('<span>Galleries</span>', false);
+        $this->actingAs(User::factory()->create())->get(route('dashboard'))->assertOk()
+            ->assertDontSee('<span>Galleries</span>', false)
+            ->assertDontSee(route('galleries.show', 'autumn'));
+        $this->get('/')->assertOk()->assertSee('<span>Galleries</span>', false);
+    }
+
+    /**
+     * Do not display an empty gallery dropdown.
+     */
+    public function test_gallery_dropdown_is_hidden_without_published_galleries(): void
+    {
+        Gallery::create(['title' => 'Draft gallery', 'slug' => 'draft', 'is_published' => false]);
+        $this->get('/')->assertOk()->assertDontSee('<span>Galleries</span>', false);
+    }
+
+    /**
+     * Gallery links identify the current page without confusing matching CMS slugs.
+     */
+    public function test_gallery_dropdown_marks_current_gallery(): void
+    {
+        Gallery::create(['title' => 'Shared gallery', 'slug' => 'shared', 'is_published' => true]);
+        CmsPage::create([
+            'title' => 'Shared CMS page', 'slug' => 'shared', 'template' => 'standard', 'is_published' => true,
+        ]);
+
+        $this->get(route('galleries.show', 'shared'))->assertOk()
+            ->assertSee('aria-current="page"', false)
+            ->assertDontSee('class="universe-topbar__link universe-topbar__link--primary" href="'
+                . route('cms.pages.show', 'shared') . '"', false);
+        $this->get(route('cms.pages.show', 'shared'))->assertOk()
+            ->assertSee('<span>Galleries</span>', false)
+            ->assertDontSee('aria-current="page"', false);
     }
 }
