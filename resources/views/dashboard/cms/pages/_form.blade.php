@@ -58,6 +58,18 @@
         <input type="checkbox" name="is_published" value="1" @checked(old('is_published', $page->is_published))>
         Published
     </label>
+    <div class="form-group">
+        <input type="hidden" name="show_in_menu" value="0">
+        <label class="checkbox-line">
+            <input type="checkbox" name="show_in_menu" value="1"
+                   aria-describedby="show-in-menu-help"
+                   @checked(old('show_in_menu', $page->show_in_menu ?? true))>
+            Show in top menu
+        </label>
+        <p class="form-help" id="show-in-menu-help">
+            Uncheck to hide this page from the top menu. Published pages remain accessible by link.
+        </p>
+    </div>
 </div>
 
 <div class="paragraphs-header" id="paragraphs">

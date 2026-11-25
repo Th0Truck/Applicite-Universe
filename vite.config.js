@@ -10,8 +10,10 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/css/dashboard.css',
                 'resources/css/frontend.css',
+                'resources/css/gallery.css',
                 'resources/css/styleguide.css',
                 'resources/js/app.js',
+                'resources/js/gallery.js',
             ],
             refresh: true,
             fonts: [

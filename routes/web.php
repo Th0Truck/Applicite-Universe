@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardGalleryController;
+use App\Http\Controllers\DashboardGalleryImageController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\TwoFactorAuthenticationSetupController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +61,38 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::delete('/pages/{page}', [CmsPageController::class, 'destroy'])
         ->middleware('permission:pages.delete')
         ->name('cms.pages.destroy');
+
+    Route::get('/galleries', [DashboardGalleryController::class, 'index'])
+        ->middleware('permission:galleries.view')
+        ->name('galleries.index');
+
+    Route::get('/galleries/create', [DashboardGalleryController::class, 'create'])
+        ->middleware('permission:galleries.create')
+        ->name('galleries.create');
+
+    Route::post('/galleries', [DashboardGalleryController::class, 'store'])
+        ->middleware('permission:galleries.create')
+        ->name('galleries.store');
+
+    Route::get('/galleries/{gallery}/edit', [DashboardGalleryController::class, 'edit'])
+        ->middleware('permission:galleries.update')
+        ->name('galleries.edit');
+
+    Route::put('/galleries/{gallery}', [DashboardGalleryController::class, 'update'])
+        ->middleware('permission:galleries.update')
+        ->name('galleries.update');
+
+    Route::post('/galleries/{gallery}/images', [DashboardGalleryImageController::class, 'store'])
+        ->middleware('permission:galleries.update')
+        ->name('galleries.images.store');
+
+    Route::put('/galleries/{gallery}/images', [DashboardGalleryImageController::class, 'update'])
+        ->middleware('permission:galleries.update')
+        ->name('galleries.images.update');
+
+    Route::delete('/galleries/{gallery}', [DashboardGalleryController::class, 'destroy'])
+        ->middleware('permission:galleries.delete')
+        ->name('galleries.destroy');
 });
 
 Route::get('/user/two-factor-authentication', TwoFactorAuthenticationSetupController::class)
@@ -66,3 +101,6 @@ Route::get('/user/two-factor-authentication', TwoFactorAuthenticationSetupContro
 
 Route::get('/pages/{slug}', [CmsPageController::class, 'show'])
     ->name('cms.pages.show');
+
+Route::get('/galleries/{slug}', [GalleryController::class, 'show'])
+    ->name('galleries.show');

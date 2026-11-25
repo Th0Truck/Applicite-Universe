@@ -3,6 +3,7 @@
     $accountLabel = $currentUser?->name ?? $currentUser?->email;
     $currentPageSlug = request()->route('slug');
     $topbarPages = $topbarPages ?? collect();
+    $topbarGalleries = $topbarGalleries ?? collect();
 @endphp
 
 @once
@@ -24,7 +25,8 @@
             @foreach ($topbarPages as $topbarPage)
                 @php
                     $childPages = $topbarPage->children;
-                    $isCurrentPage = $currentPageSlug === $topbarPage->slug || $childPages->contains('slug', $currentPageSlug);
+                    $isCurrentPage = request()->routeIs('cms.pages.show')
+                        && ($currentPageSlug === $topbarPage->slug || $childPages->contains('slug', $currentPageSlug));
                 @endphp
 
                 @if ($childPages->isNotEmpty())
@@ -54,6 +56,27 @@
                     </a>
                 @endif
             @endforeach
+
+            @if ($topbarGalleries->isNotEmpty())
+                <details class="universe-topbar__page">
+                    <summary class="universe-topbar__button universe-topbar__page-button {{ request()->routeIs('galleries.show') ? 'universe-topbar__link--primary' : '' }}">
+                        <span>Galleries</span>
+                        <span class="universe-topbar__account-caret" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="universe-topbar__dropdown">
+                        @foreach ($topbarGalleries as $topbarGallery)
+                            <a
+                                class="universe-topbar__dropdown-item"
+                                href="{{ route('galleries.show', $topbarGallery->slug) }}"
+                                @if (request()->routeIs('galleries.show') && $currentPageSlug === $topbarGallery->slug) aria-current="page" @endif
+                            >
+                                {{ $topbarGallery->title }}
+                            </a>
+                        @endforeach
+                    </div>
+                </details>
+            @endif
 
             @auth
                 <details class="universe-topbar__account">

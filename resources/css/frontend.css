@@ -8,7 +8,7 @@ body.cms-page {
 .cms-shell {
     margin: 0 auto;
     max-width: 920px;
-    padding: 56px 20px;
+    padding: 36px 20px;
 }
 
 .cms-shell--feature {
@@ -73,7 +73,7 @@ body.cms-page {
 .cms-rich-text blockquote,
 .cms-rich-text h3,
 .cms-rich-text h4 {
-    margin: 0;
+    margin: 8px 0;
 }
 
 .cms-rich-text > * + * {

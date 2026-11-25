@@ -185,5 +185,6 @@
             </ul>
         </x-styleguide.section>
     </main>
+    <x-frontend-page-footer />
 </body>
 </html>

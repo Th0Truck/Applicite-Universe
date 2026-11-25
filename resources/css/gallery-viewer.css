@@ -1,0 +1,78 @@
+/* Native modal dialog keeps keyboard focus inside the image preview. */
+html.gallery-viewer-open {
+    overflow: hidden;
+}
+
+.gallery-viewer {
+    background: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: #fff;
+    height: 100dvh;
+    inset: 0;
+    margin: 0;
+    max-height: none;
+    max-width: none;
+    overflow: hidden;
+    padding: 80px 24px 24px;
+    width: 100%;
+}
+
+.gallery-viewer[open] {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.gallery-viewer::backdrop {
+    background: rgb(8 12 20 / 94%);
+    backdrop-filter: blur(8px);
+}
+
+.gallery-viewer__controls {
+    margin: 0;
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right));
+    top: max(16px, env(safe-area-inset-top));
+}
+
+.gallery-viewer__close {
+    align-items: center;
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 600;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 18px;
+}
+
+.gallery-viewer__close span {
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.gallery-viewer__close:hover {
+    background: rgb(255 255 255 / 20%);
+}
+
+.gallery-viewer__close:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+}
+
+.gallery-viewer__image {
+    border-radius: 4px;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 45%);
+    display: block;
+    height: auto;
+    max-height: calc(100dvh - 104px);
+    max-width: 100%;
+    object-fit: contain;
+    width: auto;
+}

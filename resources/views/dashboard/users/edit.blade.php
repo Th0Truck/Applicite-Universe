@@ -86,6 +86,7 @@
         </section>
 
         <x-dashboard-footer />
+        <x-frontend-page-footer />
     </main>
 </body>
 </html>
