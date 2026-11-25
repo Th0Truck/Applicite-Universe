@@ -18,7 +18,7 @@ body.gallery-page {
 
 .gallery {
     margin: 0 auto;
-    max-width: 1180px;
+    /*max-width: 1180px;*/
     padding: clamp(28px, 5vw, 64px) 20px;
 }
 
@@ -30,24 +30,34 @@ body.gallery-page {
 
 .gallery h1 {
     font-size: clamp(30px, 5vw, 48px);
+    position: fixed;
+    top: 80px;
     font-weight: 800;
     letter-spacing: -0.035em;
     line-height: 1.15;
     margin: 0;
+    text-shadow: 0 3px 5px rgb(0 0 0 / 25%);
+    z-index: 988;
+    pointer-events: none;
 }
 
 .gallery-description {
     color: var(--gallery-muted);
+    position: fixed;
+    top: 110px;
     font-size: 17px;
     line-height: 1.75;
     margin-top: 16px;
     white-space: pre-line;
+    text-shadow: 0 3px 5px rgb(255 255 255 / 25%);
+    z-index: 987;
+    pointer-events: none;
 }
 
 .gallery-grid {
     display: grid;
     gap: 1px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .gallery .gallery-image {
